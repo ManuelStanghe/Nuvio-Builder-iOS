@@ -111,6 +111,7 @@ jobs:
         with:
           tag_name: ${{ env.TAG }}
           name: Nuvio ${{ env.TAG }}
+          body: "**Full Changelog**: https://github.com/NuvioMedia/NuvioMobile/releases/tag/${{ env.TAG }}"
           files: iosApp/build/Build/Products/Release-iphoneos/${{ env.IPA_FILENAME }}
           generate_release_notes: false
         env:
