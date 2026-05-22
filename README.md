@@ -20,7 +20,6 @@ Queste funzionalità sono disabilitate nella distribuzione ufficiale via TestFli
 
 1. Scarica l'ultima `.ipa` dalla sezione [Releases](../../releases)
 2. Installala tramite sideload
-3. SideStore rinnoverà automaticamente la firma dell'app ogni 7 giorni
 
 ## Disclaimer
 
