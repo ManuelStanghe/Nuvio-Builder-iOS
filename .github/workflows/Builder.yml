@@ -1,4 +1,4 @@
-name: Build Nuvio Mobile (iOS)
+name: IPA Builder
 
 on:
   workflow_dispatch:
