@@ -1,0 +1,117 @@
+name: Build Nuvio Mobile (iOS)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'  # ogni ora
+
+jobs:
+  build-ios-full:
+    name: Build iOS Full Version
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check if new version available
+        id: check_version
+        run: |
+          LATEST_TAG=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/NuvioMedia/NuvioMobile/releases/latest" | \
+            python3 -c "import sys,json; print(json.load(sys.stdin)['tag_name'])")
+
+          LATEST_RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/latest" | \
+            python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tag_name','none'))")
+
+          echo "TAG=$LATEST_TAG" >> $GITHUB_ENV
+          echo "Upstream: $LATEST_TAG | Current: $LATEST_RELEASE"
+
+          LATEST_TAG_CLEAN="${LATEST_TAG#v}"
+          LATEST_RELEASE_CLEAN="${LATEST_RELEASE#v}"
+
+          if [ "$LATEST_TAG_CLEAN" = "$LATEST_RELEASE_CLEAN" ]; then
+            echo "SKIP=true" >> $GITHUB_ENV
+            echo "Already up to date, skipping build."
+          else
+            echo "SKIP=false" >> $GITHUB_ENV
+            echo "New version found, building!"
+          fi
+
+      - name: Checkout Repository & Submodules
+        if: env.SKIP == 'false'
+        uses: actions/checkout@v4
+        with:
+          repository: NuvioMedia/NuvioMobile
+          ref: ${{ env.TAG }}
+          submodules: false
+
+      - name: Fetch iOS Specific Submodule
+        if: env.SKIP == 'false'
+        run: git submodule update --init --recursive MPVKit
+
+      - name: Select Latest Stable Xcode
+        if: env.SKIP == 'false'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Make gradlew executable
+        if: env.SKIP == 'false'
+        run: chmod +x ./gradlew
+
+      - name: Set up JDK 17
+        if: env.SKIP == 'false'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Generate local.properties
+        if: env.SKIP == 'false'
+        run: |
+          cat << 'EOF' > local.properties
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          TRAKT_CLIENT_ID=${{ secrets.TRAKT_CLIENT_ID }}
+          TRAKT_CLIENT_SECRET=${{ secrets.TRAKT_CLIENT_SECRET }}
+          TRAKT_REDIRECT_URI=nuvio://auth/trakt
+          INTRODB_API_URL=https://introdb.strem.fun
+          DONATIONS_BASE_URL=https://ko-fi.com/tapframe
+          NUVIO_IOS_DISTRIBUTION=full
+          EOF
+
+      - name: Build iOS App via Xcode
+        if: env.SKIP == 'false'
+        run: |
+          cd iosApp
+          xcodebuild \
+            -project iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package App into .ipa
+        if: env.SKIP == 'false'
+        run: |
+          cd iosApp/build/Build/Products/Release-iphoneos
+          mkdir Payload
+          mv Nuvio.app Payload/
+          zip -q -r "Nuvio-v${{ env.TAG }}-Full.ipa" Payload
+          echo "IPA_FILENAME=Nuvio-v${{ env.TAG }}-Full.ipa" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        if: env.SKIP == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: Nuvio ${{ env.TAG }}
+          files: iosApp/build/Build/Products/Release-iphoneos/${{ env.IPA_FILENAME }}
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
