@@ -1,6 +1,6 @@
 # Nuvio Builder iOS
 
-Builder automatico di [Nuvio](https://github.com/NuvioMedia/NuvioMobile) — genera l'IPA in versione **Full** per iOS (con plugin e P2P abilitati).
+Builder automatico di [Nuvio](https://github.com/NuvioMedia/NuvioMobile) — genera l'IPA in versione **Full** per iOS.
 
 ## Come funziona
 
