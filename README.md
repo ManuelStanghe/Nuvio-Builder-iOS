@@ -23,4 +23,5 @@ Le build ufficiali di TestFlight rimuovono le funzionalità dei plugin e dei tra
 ## Disclaimer
 
 Questo progetto non è affiliato né approvato dagli sviluppatori di Nuvio. Si limita ad automatizzare il processo di build dal repository ufficiale open-source. Per l'app ufficiale usa [TestFlight](https://testflight.apple.com/join/u4y7MHK9).
+
 Non sono un sviluppatore, quindi non posso risolvere bug o aggiungere nuove funzionalità. Compilato solamente il file `.ipa` direttamente dal codice sorgente originale.
