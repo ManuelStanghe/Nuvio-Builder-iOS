@@ -1,10 +1,10 @@
 # Nuvio Builder iOS
 
-Builder automatico per [Nuvio](https://github.com/NuvioMedia/NuvioMobile) — genera la IPA **Full** per iOS (con plugin e P2P abilitati) e la pubblica come GitHub Release.
+Builder automatico di [Nuvio](https://github.com/NuvioMedia/NuvioMobile) — genera l'IPA in versione **Full** per iOS (con plugin e P2P abilitati).
 
 ## Come funziona
 
-Un workflow GitHub Actions si avvia ogni ora e controlla se è stata rilasciata una nuova versione sul repository ufficiale di Nuvio. Se viene trovata una nuova versione, compila automaticamente la IPA Full e la pubblica qui nella sezione [Releases](../../releases).
+Un workflow controlla ogni ora la presenza di una nuova versione sul repository ufficiale di Nuvio. Se viene trovata una nuova versione, la compila automaticamente e la pubblica nella sezione [Releases](../../releases).
 
 Il codice sorgente viene scaricato direttamente da `NuvioMedia/NuvioMobile` all'ultimo tag rilasciato, quindi questo repo contiene solo il file del workflow.
 
@@ -19,7 +19,7 @@ Queste funzionalità sono disabilitate nella distribuzione ufficiale via TestFli
 ## Installazione
 
 1. Scarica l'ultima `.ipa` dalla sezione [Releases](../../releases)
-2. Installala tramite [SideStore](https://sidestore.io) o [LiveContainer](https://github.com/khanhduytran0/LiveContainer)
+2. Installala tramite sideload
 3. SideStore rinnoverà automaticamente la firma dell'app ogni 7 giorni
 
 ## Disclaimer
