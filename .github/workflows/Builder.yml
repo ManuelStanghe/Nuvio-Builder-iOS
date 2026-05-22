@@ -11,6 +11,7 @@ jobs:
     runs-on: macos-latest
     permissions:
       contents: write
+    timeout-minutes: 60
     steps:
       - name: Check if new version available
         id: check_version
