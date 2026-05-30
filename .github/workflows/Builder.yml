@@ -3,7 +3,7 @@ name: IPA Builder
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 * * * *'  # ogni ora
+    - cron: '0 */6 * * *'  # ogni ora
 
 jobs:
   build-ios-full:
